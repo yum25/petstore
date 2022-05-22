@@ -1,12 +1,11 @@
-import { combineReducers } from 'redux';
 import { ADD_PET } from './types';
 
 const INITIAL_STATE = {
   adopted: [],
   displayed: [
-    'Goldfish',
-    'German Shepherd',
-    'Tabby',
+    'Quagsire',
+    'Darmanitan',
+    'Archeops',
   ],
 };
 

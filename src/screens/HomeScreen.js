@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, 
-        Keyboard, 
-        Text, 
-        TextInput, 
-        TouchableOpacity, 
-        View,
-        StyleSheet,
-        Button 
-    } from 'react-native';
+import { Text, TouchableOpacity, View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { auth } from '../firebase/config'
 import { signOut } from 'firebase/auth'; 
 import Pet from './components/Pets' 
@@ -16,6 +8,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../firebase/config';
 import { useNavigation } from '@react-navigation/native';
 import { addPet } from '../redux/PetActions';
+
 
 const HomeScreen = ( props ) => {
     const navigation = useNavigation();
@@ -36,39 +29,30 @@ const HomeScreen = ( props ) => {
         navigation.navigate('Store')
     }
     useEffect(() => {
-        console.log("Update firebase")
         const q = query(collection(db, "pets"))
         getDocs(q).then(querySnap => 
             querySnap.forEach((doc) => {
                 const pet = doc.data().name
                 if (displayedpets.find(element => element == pet) )
                     dispatch(addPet(pet))
-                    console.log("add " + pet)
             }))
     })
 
     useEffect(() => {
         const q = query(collection(db, "pets"), where("owner", "==", userID))
-        console.log("Query: " + q)
         getDocs(q).then(querySnap => {
             const newPets = []
             querySnap.forEach((doc) => {
                 const pet = doc.data().name
-                console.log("Pets this user owns: " +pet)
                 newPets.push(pet)
-                console.log(newPets)
             })
             setPets(newPets)
         })
-            console.log("UPDATED PETS:" + pets)
-    }, [])
+    }, [displayedpets])
     
-    console.log(pets[0]);
-    console.log(pets[1]);
-    console.log(pets[2]);
-    console.log(pets);
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
+            <ScrollView>
             <TouchableOpacity 
                 style={styles.button}
                 onPress={() => onStorePress()}
@@ -78,15 +62,20 @@ const HomeScreen = ( props ) => {
             <Text style={styles.title}>You own {pets.length} pets</Text>
             {
                 pets.map((pet, index) => (
-                    <Button
-                    key={ pet }
-                    title={ `${ pet }`}
-                    />))
+                    <TouchableOpacity key={pet} style={{
+                        width: 200,
+                        height: 200,
+                        }}>
+                        <Pet text={pet} type={pet} />
+                    </TouchableOpacity>
+                    ))
+
             }
             <View style={styles.footerView}>
                     <Text onPress={onLogOutPress} style={styles.footerLink}>Log out</Text>
             </View>
-        </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 
@@ -94,13 +83,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center'
-    },
-    logo: {
-        flex: 1,
-        height: 120,
-        width: 140,
-        alignSelf: 'center',
-        margin: 30
     },
     title: {
         alignSelf: 'center',
@@ -130,17 +112,6 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: "bold"
-    },
-    input: {
-       height: 48,
-       borderRadius: 5,
-       overflow: 'hidden',
-       backgroundColor: 'white',
-       marginTop: 10,
-       marginBottom: 10,
-       marginLeft: 30,
-       marginRight: 30,
-       paddingLeft: 16
     },
     footerView: {
         flex: 1,

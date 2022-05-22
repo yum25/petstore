@@ -49,10 +49,10 @@ const RegistrationScreen = ({ navigation }) => {
                 keyboardShouldPersistTaps="always">
                 <Image
                     style={styles.logo}
-                    source={require('../../assets/icon.png')}
+                    source={require('../../assets/pc.png')}
                 />
                 <Text style={styles.title}>Registration</Text>
-                <Text style={styles.description}>Register to Start Collecting Pets</Text>
+                <Text style={styles.description}>Register to Start Collecting!</Text>
                 <TextInput
                     style={styles.input}
                     placeholder='Full Name'

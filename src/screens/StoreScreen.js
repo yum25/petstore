@@ -1,25 +1,24 @@
-import React, { useEffect, useState } from 'react'
-import { Button, FlatList, Keyboard, Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native'
+import React, { useEffect } from 'react'
+import { Text, TouchableOpacity, View, StyleSheet } from 'react-native'
 import Pet from './components/Pets';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPet } from '../redux/PetActions';
 import { db } from '../firebase/config';
-import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, collection, query, getDocs } from 'firebase/firestore';
 
 
 const StoreScreen = ( props ) => {
     const dispatch = useDispatch();
     const displayedpets = useSelector(state => state.displayed)
+    const adoptedpets = useSelector(state => state.adopted)
 
     useEffect(() => {
-        console.log("Update firebase")
         const q = query(collection(db, "pets"))
         getDocs(q).then(querySnap => 
             querySnap.forEach((doc) => {
                 const pet = doc.data().name
                 if (displayedpets.find(element => element == pet) )
                     dispatch(addPet(pet))
-                    console.log("add " + pet)
             }))
     })
 
@@ -34,14 +33,24 @@ const StoreScreen = ( props ) => {
     return (
     <View style={styles.container}>
         <Text style={styles.title}>Adopt a Pet!</Text>
+        <Text style={{
+            fontWeight: 'bold', 
+            alignSelf: 'center', 
+            fontSize: 20,
+            marginBottom: 15
+            }}>{adoptedpets.length} pets have been adopted</Text>
         {
         displayedpets.map((pet, index) => (
-        <Button
-        key={ pet }
-        title={ `Adopt ${ pet }` }
-        onPress={() => onAddPetPressed(pet)
-        }
-        />
+            <TouchableOpacity 
+            key={pet} 
+            style={{
+                width: 200,
+                height: 200,
+                marginRight: 190
+                }}
+                onPress={() => onAddPetPressed(pet)}>
+                <Pet text={`Adopt ${ pet }`} type={pet}/>
+            </TouchableOpacity>
         ))
         }
         <View style={styles.footerView}>
@@ -78,46 +87,11 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 10
     },
-    button: {
-        backgroundColor: '#788eec',
-        marginLeft: 30,
-        marginRight: 30,
-        marginTop: 20,
-        height: 48,
-        borderRadius: 5,
-        alignItems: "center",
-        justifyContent: 'center'
-    },
-    buttonTitle: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: "bold"
-    },
-    input: {
-       height: 48,
-       borderRadius: 5,
-       overflow: 'hidden',
-       backgroundColor: 'white',
-       marginTop: 10,
-       marginBottom: 10,
-       marginLeft: 30,
-       marginRight: 30,
-       paddingLeft: 16
-    },
     footerView: {
         flex: 1,
         alignItems: "center",
         marginTop: 20
     },
-    footerText: {
-        fontSize: 16,
-        color: '#2e2e2d'
-    },
-    footerLink: {
-        color: "#788eec",
-        fontWeight: "bold",
-        fontSize: 16
-    }
 })
 
 export default StoreScreen;

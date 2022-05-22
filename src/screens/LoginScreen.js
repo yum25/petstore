@@ -38,9 +38,9 @@ const LoginScreen = ({ navigation }) => {
             <KeyboardAwareScrollView style={styles.keyboardView} keyboardShouldPersistTaps="always">
                 <Image 
                     style={styles.logo} 
-                    source={require('../../assets/icon.png')}/>
+                    source={require('../../assets/pc.png')}/>
                 <Text style={styles.title}>
-                    React Native Pet Store 
+                    Pokemon Center 
                 </Text>
                 <Text style={styles.description}>
                     Login to get started
@@ -91,7 +91,8 @@ const styles = StyleSheet.create({
         height: 120,
         width: 140,
         alignSelf: 'center',
-        margin: 30
+        margin: 30,
+        marginRight: 35 
     },
     title: {
         alignSelf: 'center',
