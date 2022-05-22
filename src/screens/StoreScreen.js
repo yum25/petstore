@@ -4,30 +4,42 @@ import Pet from './components/Pets';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPet } from '../redux/PetActions';
 import { db } from '../firebase/config';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 
-const StoreScreen = ( props, {navigation} ) => {
-    const petsarray = useSelector(state => state.displayed);
+const StoreScreen = ( props ) => {
     const dispatch = useDispatch();
+    const displayedpets = useSelector(state => state.displayed)
 
-    const onAddPetPressed = (index) => {
+    useEffect(() => {
+        console.log("Update firebase")
+        const q = query(collection(db, "pets"))
+        getDocs(q).then(querySnap => 
+            querySnap.forEach((doc) => {
+                const pet = doc.data().name
+                if (displayedpets.find(element => element == pet) )
+                    dispatch(addPet(pet))
+                    console.log("add " + pet)
+            }))
+    })
+
+    const onAddPetPressed = (pet) => {
         const data = {
-            name: petsarray[index],
+            name: pet,
             owner: props.extraData.id
         }
-        setDoc(doc(db, 'pets', petsarray[index]), data)
-        dispatch(addPet(index))
+        setDoc(doc(db, 'pets', pet), data)
+        dispatch(addPet(pet))
     }
     return (
     <View style={styles.container}>
         <Text style={styles.title}>Adopt a Pet!</Text>
         {
-        petsarray.map((pet, index) => (
+        displayedpets.map((pet, index) => (
         <Button
         key={ pet }
         title={ `Adopt ${ pet }` }
-        onPress={() => onAddPetPressed(index)
+        onPress={() => onAddPetPressed(pet)
         }
         />
         ))

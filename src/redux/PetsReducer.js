@@ -25,16 +25,15 @@ const petsReducer = (state = INITIAL_STATE, action) => {
 
       // Pull friend out of friends.possible
       // Note that action.payload === friendIndex
-      const addedPet = displayed.filter((pets, index) => index == action.payload);
-      displayed = displayed.filter((pets, index) => index != action.payload);
-
+      const addedPet = displayed.filter((pets) => pets == action.payload);
+      displayed = displayed.filter((pets) => pets != action.payload);
+      
       // And put friend in friends.current
-      adopted = [...adopted, addedPet]
+      adopted = [...adopted, ...addedPet]
 
       // Finally, update the redux state
       const newState = { adopted, displayed };
-      console.log(newState);
-      console.log(state);
+      
       return newState;
 
     default:

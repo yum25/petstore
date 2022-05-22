@@ -11,16 +11,19 @@ import { FlatList,
 import { auth } from '../firebase/config'
 import { signOut } from 'firebase/auth'; 
 import Pet from './components/Pets' 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../firebase/config';
 import { useNavigation } from '@react-navigation/native';
+import { addPet } from '../redux/PetActions';
 
 const HomeScreen = ( props ) => {
     const navigation = useNavigation();
+    const dispatch = useDispatch();
     const userID = props.extraData.id;
     const [pets, setPets] = useState([])
-
+    const displayedpets = useSelector(state => state.displayed);
+    
     const onLogOutPress = () => {
         signOut(auth)
         .catch((error) => {
@@ -32,21 +35,38 @@ const HomeScreen = ( props ) => {
     const onStorePress = () => {
         navigation.navigate('Store')
     }
-
     useEffect(() => {
-        const q = query(collection(db, "pets"), where("owner", "==", userID))
-        const newPets = []
+        console.log("Update firebase")
+        const q = query(collection(db, "pets"))
         getDocs(q).then(querySnap => 
             querySnap.forEach((doc) => {
                 const pet = doc.data().name
-                newPets.push(pet)
-                setPets(newPets)
+                if (displayedpets.find(element => element == pet) )
+                    dispatch(addPet(pet))
+                    console.log("add " + pet)
             }))
     })
 
+    useEffect(() => {
+        const q = query(collection(db, "pets"), where("owner", "==", userID))
+        console.log("Query: " + q)
+        getDocs(q).then(querySnap => {
+            const newPets = []
+            querySnap.forEach((doc) => {
+                const pet = doc.data().name
+                console.log("Pets this user owns: " +pet)
+                newPets.push(pet)
+                console.log(newPets)
+            })
+            setPets(newPets)
+        })
+            console.log("UPDATED PETS:" + pets)
+    }, [])
     
-    const mypets = useSelector(state => state.adopted);
-
+    console.log(pets[0]);
+    console.log(pets[1]);
+    console.log(pets[2]);
+    console.log(pets);
     return (
         <View style={styles.container}>
             <TouchableOpacity 
@@ -55,15 +75,14 @@ const HomeScreen = ( props ) => {
             >
                 <Text style={styles.buttonTitle}>Go To Store</Text>
             </TouchableOpacity>
-
+            <Text style={styles.title}>You own {pets.length} pets</Text>
             {
                 pets.map((pet, index) => (
                     <Button
                     key={ pet }
-                    title={ `${ pet }` }
+                    title={ `${ pet }`}
                     />))
             }
-            
             <View style={styles.footerView}>
                     <Text onPress={onLogOutPress} style={styles.footerLink}>Log out</Text>
             </View>
@@ -74,6 +93,7 @@ const HomeScreen = ( props ) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center'
     },
     logo: {
         flex: 1,
@@ -84,8 +104,11 @@ const styles = StyleSheet.create({
     },
     title: {
         alignSelf: 'center',
-        fontSize: 24,
-        fontWeight: "bold"
+        fontSize: 20,
+        fontWeight: "bold",
+        marginTop: 30,
+        marginBottom: 15,
+        justifyContent: 'center',
     },
     description: {
         alignSelf: 'center',
