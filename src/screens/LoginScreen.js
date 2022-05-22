@@ -40,7 +40,7 @@ const LoginScreen = ({ navigation }) => {
                     style={styles.logo} 
                     source={require('../../assets/pc.png')}/>
                 <Text style={styles.title}>
-                    Pokemon Center 
+                    Pet Store 
                 </Text>
                 <Text style={styles.description}>
                     Login to get started
